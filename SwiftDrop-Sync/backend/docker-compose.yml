@@ -1,0 +1,91 @@
+version: '3.9'
+
+services:
+
+  # ── MongoDB ──────────────────────────────────────────────────────────────────
+  mongo:
+    image: mongo:7.0
+    container_name: swiftdrop_mongo
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: swiftdrop
+      MONGO_INITDB_ROOT_PASSWORD: swiftdrop_secret
+      MONGO_INITDB_DATABASE: swiftdrop
+    volumes:
+      - mongo_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/init.js:ro
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Redis (session cache / queue) ────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: swiftdrop_redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    command: redis-server --requirepass redis_secret
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── API Server ────────────────────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    container_name: swiftdrop_api
+    restart: unless-stopped
+    ports:
+      - '5000:5000'
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      MONGO_URI: mongodb://swiftdrop:swiftdrop_secret@mongo:27017/swiftdrop?authSource=admin
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/logs
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:5000/api/v1/health']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # ── Mongo Express (DB GUI, dev only) ─────────────────────────────────────────
+  mongo-express:
+    image: mongo-express:1.0
+    container_name: swiftdrop_mongoexpress
+    restart: unless-stopped
+    ports:
+      - '8081:8081'
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: swiftdrop
+      ME_CONFIG_MONGODB_ADMINPASSWORD: swiftdrop_secret
+      ME_CONFIG_MONGODB_URL: mongodb://swiftdrop:swiftdrop_secret@mongo:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin123
+    depends_on:
+      mongo:
+        condition: service_healthy
+    profiles:
+      - dev   # only starts with: docker compose --profile dev up
+
+volumes:
+  mongo_data:
+
+networks:
+  default:
+    name: swiftdrop_network

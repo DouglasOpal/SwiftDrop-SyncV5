@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "SwiftDrop",
+    "slug": "swiftdrop",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "ng.swiftdrop.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "SwiftDrop uses your location to set the pickup point for your delivery.",
+        "NSCameraUsageDescription": "SwiftDrop uses your camera to take profile photos and upload KYC documents.",
+        "NSPhotoLibraryUsageDescription": "SwiftDrop accesses your photo library to set a profile picture and upload documents."
+      }
+    },
+    "android": {
+      "package": "ng.swiftdrop.app",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "SwiftDrop uses your location to detect your pickup point."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "SwiftDrop accesses photos to set your profile picture.",
+          "cameraPermission": "SwiftDrop uses the camera for profile photos and KYC documents."
+        }
+      ]
+    ]
+  }
+}
