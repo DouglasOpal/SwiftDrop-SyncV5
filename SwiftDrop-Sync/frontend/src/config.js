@@ -10,7 +10,7 @@ const PORT = 5000;
 
 // Manual override: if auto-detection ever fails, hardcode your machine's LAN IP
 // here, e.g. 'http://192.168.1.20:5000'. Leave null to auto-detect.
-const API_OVERRIDE = null;
+const API_OVERRIDE = 'https://swiftdrop-syncv5.onrender.com';
 
 // When running in Expo Go / dev, the app is served from your computer's LAN IP.
 // We reuse that exact IP for the API so a physical phone can reach the backend
