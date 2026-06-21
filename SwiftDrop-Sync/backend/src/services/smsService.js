@@ -32,9 +32,9 @@ async function sendViaTermii(phone, message) {
     from:     process.env.TERMII_SENDER_ID || 'SwiftDrop',
     sms:      message,
     type:     'plain',
-    channel:  'generic',
+    channel:  process.env.TERMII_CHANNEL || 'dnd',  // 'dnd' for OTP/transactional; 'generic' is promo-only
     api_key:  process.env.TERMII_API_KEY,
-  });
+  }, { timeout: 15000 });
 
   if (data.code !== 'ok') {
     throw new Error(`Termii error: ${data.message}`);
