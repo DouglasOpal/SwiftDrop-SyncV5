@@ -9,7 +9,8 @@
     "test": "jest --runInBand --forceExit",
     "test:watch": "jest --watch",
     "lint": "eslint src/**/*.js",
-    "seed": "node src/utils/seed.js"
+    "seed": "node src/utils/seed.js",
+    "create-admin": "node src/utils/create-admin.js"
   },
   "dependencies": {
     "aws-sdk": "^2.1652.0",
